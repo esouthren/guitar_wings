@@ -24,7 +24,6 @@ class Application extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(height: 200),
-                Image.asset('basswings.png'),
                 _button(context, 'Guitar Tuner', Tuner()),
                 const SizedBox(height: 30),
                 _button(context, 'Second thingy', Tuner()),
