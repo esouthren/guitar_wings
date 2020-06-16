@@ -23,7 +23,11 @@ class Application extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const SizedBox(height: 200),
+                Image.asset(
+                  'assets/wings.png',
+                  width: MediaQuery.of(context).size.width,
+                ),
+                const SizedBox(height: 10),
                 _button(context, 'Guitar Tuner', Tuner()),
                 const SizedBox(height: 30),
                 _button(context, 'Second thingy', Tuner()),
