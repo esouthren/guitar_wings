@@ -70,10 +70,11 @@ class TunerState extends State<Tuner> {
             Text(
               'Tuner',
               style: TextStyle(
-                fontSize: 80,
+                fontSize: 100,
+                color: isOnPitch ? Colors.green : Colors.red,
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             _makeTunerRow(context),
             Text(
               isRecording ? note : '-',
@@ -133,7 +134,12 @@ class TunerState extends State<Tuner> {
   _startRecording() async {
     print("starting...");
     print(flutterFft.getTuning);
-    flutterFft.setTuning = ["B0", "E1", "A1", "D2", "G2", "C3"];
+
+    // bass
+    //flutterFft.setTuning = ["B0", "E1", "A1", "D2", "G2", "C3"];
+
+    // standard electric
+    flutterFft.setTuning = ["E2", "A2", "D3", "G3", "B3", "E4"];
     print(flutterFft.getTuning);
 
     await flutterFft.startRecorder();
@@ -149,9 +155,9 @@ class TunerState extends State<Tuner> {
                 () => {
                   print(data),
                   frequency = data[1],
-                  note = data[2],
+                  note = data[6],
                   isOnPitch = data[10],
-                  target = data[7],
+                  target = data[3],
                 },
               ),
               flutterFft.setNote = note,
@@ -165,61 +171,105 @@ class TunerState extends State<Tuner> {
   }
 
   Widget _makeTunerRow(BuildContext context) {
-    final width = (MediaQuery.of(context).size.width * 0.9) / 7;
+    final rowCount = 15;
+    final width = (MediaQuery.of(context).size.width * 0.9) / rowCount;
+    final centreIndex = ((rowCount - 1) / 2).toInt();
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          for (var i = 0; i < rowCount; i++)
+//            Container(
+//              height: width,
+//              width: width,
+            Text(
+              '${i - 7}',
+              style: TextStyle(
+                color: _getColor(i, centreIndex, rowCount),
+              ),
+            ),
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: -50, maxDistance: -200),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: -3, maxDistance: -5),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: -1, maxDistance: -3),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: -1, maxDistance: 1),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: 1, maxDistance: 3),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: 3, maxDistance: 5),
-        ),
-        Container(
-          height: width,
-          width: width,
-          color: _getColor(minDistance: 5, maxDistance: 200),
-        ),
-      ],
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: -5, maxDistance: -200),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: -3, maxDistance: -5),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: -1, maxDistance: -3),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: -1, maxDistance: 1),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: 1, maxDistance: 3),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: 3, maxDistance: 5),
+//          ),
+//          Container(
+//            height: width,
+//            width: width,
+//            color: _getColor(minDistance: 5, maxDistance: 200),
+//          ),
+        ],
+      ),
     );
   }
 
-  Color _getColor({int minDistance, int maxDistance}) {
+  Color _getColor(int index, int centreIndex, int rowCount) {
     //final targetFrequency = target;
     final distanceFromOnPitchTarget = frequency - target;
     print('distance from on pitch: $distanceFromOnPitchTarget');
-    // ^ can also extract distance from data[4]
-    if (distanceFromOnPitchTarget > minDistance &&
-        distanceFromOnPitchTarget < maxDistance) {
-      return isOnPitch ? Colors.green : Colors.red;
+    final offCentreBy = (centreIndex - index);
+    final iteratorCount = (rowCount - 1) / 2;
+    final splits =
+        14 / rowCount; // +/- 7 Hz on each side (not including centre)
+//    switch (offCentreBy) {
+//      case 0:
+//        return isOnPitch ? Colors.green : Colors.red;
+//      case 1:
+//        return (frequency > 1 && frequency < (1 + splits * index))
+//            ? Colors.red
+//            : Colors.green;
+
+    if (index == centreIndex) {
+      return isOnPitch ? Colors.green : Colors.blueGrey;
     }
-    return Colors.blueGrey;
+    if (index == 0 && distanceFromOnPitchTarget < -7) return Colors.red;
+    if (index == rowCount && distanceFromOnPitchTarget > 7) return Colors.red;
+
+    final maxDistance = 1 + (offCentreBy * splits);
+    final minDistance = 1 + ((offCentreBy - 1) * splits);
+    //for (var i = 1; i < rowCount-1; i++) {
+    if (distanceFromOnPitchTarget > minDistance &&
+        distanceFromOnPitchTarget <= maxDistance) {
+      return Colors.red;
+    } else
+      return Colors.blueGrey;
   }
+//
+//    //for(var i = 0; i < )
+//    // ^ can also extract distance from data[4]
+//    if (distanceFromOnPitchTarget >= minDistance &&
+//        distanceFromOnPitchTarget < maxDistance) {
+//      return isOnPitch ? Colors.green : Colors.red;
+//    }
+//    return Colors.blueGrey;
+
 }
 
 // [data] index

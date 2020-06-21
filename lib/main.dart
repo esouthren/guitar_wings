@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guitar_wings/tuner/tuner.dart';
+import 'package:guitar_wings/fretboard/fretboard.dart';
 import 'package:guitar_wings/user_settings/user_settings.dart';
 
 void main() => runApp(
@@ -30,7 +31,7 @@ class Application extends StatelessWidget {
                 const SizedBox(height: 10),
                 _button(context, 'Guitar Tuner', Tuner()),
                 const SizedBox(height: 30),
-                _button(context, 'Second thingy', Tuner()),
+                _button(context, 'Fretboard Trainer', Fretboard()),
                 const SizedBox(height: 30),
                 _button(context, 'Third Thingy', Tuner()),
                 const SizedBox(height: 30),
@@ -61,7 +62,7 @@ class Application extends StatelessWidget {
       );
 
   _routeToNewPage(Widget newPage) => PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => Tuner(),
+        pageBuilder: (context, animation, secondaryAnimation) => newPage,
         transitionsBuilder: (
           context,
           animation,
